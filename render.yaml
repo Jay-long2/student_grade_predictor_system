@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: student-grade-predictor
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "python manage.py migrate && gunicorn student_grade_predictor.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: student_grade_predictor_db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+
+databases:
+  - name: student_grade_predictor_db
+    plan: free

@@ -1,0 +1,207 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Upload CSV{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">Bulk CSV Prediction</h1>
+        <p class="lead">Upload a CSV file containing student data for bulk predictions.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-file-upload"></i> Upload CSV File</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.csv_file.id_for_label }}" class="form-label">Select CSV File</label>
+                        {{ form.csv_file }}
+                        <div class="form-text">Maximum file size: 10MB. File must be in CSV format.</div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-brain"></i> Process & Predict
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> CSV Format Requirements</h5>
+            </div>
+            <div class="card-body">
+                <p>Your CSV file must contain the following columns (exact names):</p>
+                
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Format</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GPA</code></td>
+                            <td>Number (0.0 - 4.0)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Completed_Units</code></td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td><code>Internship_Completed</code></td>
+                            <td>"Yes" or "No"</td>
+                        </tr>
+                        <tr>
+                            <td><code>Participation</code></td>
+                            <td>"Low", "Medium", or "High"</td>
+                        </tr>
+                        <tr>
+                            <td><code>Discipline_Score</code></td>
+                            <td>Number (0-100)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Assignment_Score</code></td>
+                            <td>Number (0-100)</td>
+                        </tr>
+                        <tr>
+                            <td><code>Student_ID</code> (optional)</td>
+                            <td>Any identifier</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="alert alert-warning small">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important:</strong> Column names are case-sensitive and must match exactly.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-download"></i> Download Template</h5>
+            </div>
+            <div class="card-body text-center">
+                <p>Download a sample CSV file to see the correct format:</p>
+                <a href="{% url 'download_training_data' %}" class="btn btn-outline-success">
+                    <i class="fas fa-file-csv"></i> Download Sample CSV
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Example CSV Preview -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-table"></i> Example CSV Structure</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student_ID</th>
+                                <th>GPA</th>
+                                <th>Completed_Units</th>
+                                <th>Internship_Completed</th>
+                                <th>Participation</th>
+                                <th>Discipline_Score</th>
+                                <th>Assignment_Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>STU001</td>
+                                <td>3.8</td>
+                                <td>150</td>
+                                <td>Yes</td>
+                                <td>High</td>
+                                <td>90</td>
+                                <td>85</td>
+                            </tr>
+                            <tr>
+                                <td>STU002</td>
+                                <td>2.5</td>
+                                <td>120</td>
+                                <td>No</td>
+                                <td>Medium</td>
+                                <td>75</td>
+                                <td>70</td>
+                            </tr>
+                            <tr>
+                                <td>STU003</td>
+                                <td>1.8</td>
+                                <td>80</td>
+                                <td>No</td>
+                                <td>Low</td>
+                                <td>60</td>
+                                <td>55</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small">Note: Student_ID column is optional. If not provided, system will generate IDs automatically.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Information -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> How It Works</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-upload fa-lg"></i>
+                        </div>
+                        <h6 class="mt-2">Upload CSV</h6>
+                        <p class="small text-muted">Upload your student data file</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-cog fa-lg"></i>
+                        </div>
+                        <h6 class="mt-2">Process Data</h6>
+                        <p class="small text-muted">System validates and processes data</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-brain fa-lg"></i>
+                        </div>
+                        <h6 class="mt-2">ML Prediction</h6>
+                        <p class="small text-muted">AI model predicts grades</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-download fa-lg"></i>
+                        </div>
+                        <h6 class="mt-2">Get Results</h6>
+                        <p class="small text-muted">Download or view predictions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

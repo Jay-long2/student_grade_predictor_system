@@ -1,0 +1,109 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row align-items-center min-vh-50">
+    <div class="col-lg-6">
+        <h1 class="display-4 fw-bold text-primary mb-4">
+            Student Grade Predictor
+        </h1>
+        <p class="lead mb-4">
+            Predict your final academic classification using machine learning. 
+            Get insights into your academic performance and identify areas for improvement.
+        </p>
+        
+        <div class="mb-4">
+            <h5><i class="fas fa-check-circle text-success"></i> Key Features:</h5>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-arrow-right text-primary"></i> Accurate grade prediction using Random Forest</li>
+                <li><i class="fas fa-arrow-right text-primary"></i> CSV upload for bulk predictions</li>
+                <li><i class="fas fa-arrow-right text-primary"></i> Interactive data visualization</li>
+                <li><i class="fas fa-arrow-right text-primary"></i> User-friendly web interface</li>
+            </ul>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-user-plus"></i> Get Started
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        {% endif %}
+    </div>
+    
+   <!-- Replace this section in templates/users/home.html -->
+<div class="col-lg-6 text-center">
+    <div class="card border-0 shadow-lg">
+        <div class="card-body p-5">
+            <div class="feature-icon bg-primary bg-gradient rounded-circle mb-4 mx-auto" 
+                 style="width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-graduation-cap fa-3x text-white"></i>
+            </div>
+            <h3 class="text-primary mb-3">Intelligent Grade Prediction</h3>
+            <p class="text-muted">
+                Our AI system analyzes multiple academic factors to provide accurate 
+                grade predictions and actionable insights for student success.
+            </p>
+            
+            <!-- Mini stats -->
+            <div class="row mt-4">
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="h4 text-success mb-1">92%</div>
+                        <small class="text-muted">Accuracy</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="h4 text-info mb-1">5</div>
+                        <small class="text-muted">Classes</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="h4 text-warning mb-1">6</div>
+                        <small class="text-muted">Features</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Machine Learning</h5>
+                <p class="card-text">Advanced Random Forest algorithm for accurate predictions based on academic data.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Data Visualization</h5>
+                <p class="card-text">Interactive charts and graphs to help you understand your academic performance.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-file-csv fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Bulk Processing</h5>
+                <p class="card-text">Upload CSV files for multiple student predictions with detailed analysis.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

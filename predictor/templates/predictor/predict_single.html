@@ -1,0 +1,102 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Single Prediction{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h1 class="display-4">Single Student Prediction</h1>
+        <p class="lead">Enter student data to predict their final grade classification.</p>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Student Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.gpa.label }}</label>
+                            {{ form.gpa }}
+                            <div class="form-text">Enter GPA between 0.0 and 4.0</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.completed_units.label }}</label>
+                            {{ form.completed_units }}
+                            <div class="form-text">Total number of academic units completed</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.internship_completed.label }}</label>
+                            {{ form.internship_completed }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.participation.label }}</label>
+                            {{ form.participation }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.discipline_score.label }}</label>
+                            {{ form.discipline_score }}
+                            <div class="form-text">Enter score between 0 and 100</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.assignment_score.label }}</label>
+                            {{ form.assignment_score }}
+                            <div class="form-text">Enter score between 0 and 100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-brain"></i> Predict Grade
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Information Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> About the Prediction</h5>
+            </div>
+            <div class="card-body">
+                <p>The system uses a trained Random Forest machine learning model to predict the student's final academic classification based on the input features.</p>
+                
+                <h6>Prediction Classes:</h6>
+                <div class="row">
+                    <div class="col-6 col-md-4 mb-2">
+                        <span class="badge bg-success">First Class</span>
+                    </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <span class="badge bg-info">Second Upper</span>
+                    </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <span class="badge bg-warning">Second Lower</span>
+                    </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <span class="badge bg-primary">Pass</span>
+                    </div>
+                    <div class="col-6 col-md-4 mb-2">
+                        <span class="badge bg-danger">Fail</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+</style>
+{% endblock %}

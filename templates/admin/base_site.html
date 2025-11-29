@@ -1,0 +1,288 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ title }} | Student Grade Predictor Admin{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* Admin Custom Styles */
+    :root {
+        --primary-admin: #2c3e50;
+        --secondary-admin: #3498db;
+        --accent-admin: #e74c3c;
+        --success-admin: #27ae60;
+        --warning-admin: #f39c12;
+    }
+    
+    #header {
+        background: linear-gradient(135deg, var(--primary-admin) 0%, #34495e 100%) !important;
+        color: white !important;
+        border-bottom: none !important;
+    }
+    
+    #branding h1 {
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 1.5rem !important;
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background: linear-gradient(135deg, var(--secondary-admin) 0%, #2980b9 100%) !important;
+        color: white !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.8rem 1rem !important;
+    }
+    
+    #content-main .module {
+        border-radius: 10px !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        border: none !important;
+        overflow: hidden !important;
+    }
+    
+    .dashboard .module table th {
+        background: var(--primary-admin) !important;
+        color: white !important;
+        border: none !important;
+        padding: 1rem !important;
+    }
+    
+    .dashboard .module table td {
+        padding: 0.8rem 1rem !important;
+        border-bottom: 1px solid #e9ecef !important;
+    }
+    
+    .object-tools a {
+        background: var(--success-admin) !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .object-tools a:hover {
+        background: #229954 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+    }
+    
+    .submit-row input {
+        background: linear-gradient(135deg, var(--secondary-admin) 0%, #2980b9 100%) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.7rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .submit-row input:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+    }
+    
+    .breadcrumbs {
+        background: rgba(52, 152, 219, 0.1) !important;
+        border-radius: 8px !important;
+        padding: 0.8rem 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .form-row {
+        border-bottom: 1px solid #e9ecef !important;
+        padding: 1rem 0 !important;
+    }
+    
+    .form-row:last-child {
+        border-bottom: none !important;
+    }
+    
+    input[type="text"], input[type="password"], input[type="email"], 
+    input[type="url"], input[type="number"], textarea, select {
+        border: 2px solid #e9ecef !important;
+        border-radius: 8px !important;
+        padding: 0.7rem 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    input[type="text"]:focus, input[type="password"]:focus, 
+    input[type="email"]:focus, input[type="url"]:focus, 
+    input[type="number"]:focus, textarea:focus, select:focus {
+        border-color: var(--secondary-admin) !important;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    }
+    
+    .selector h2 {
+        background: var(--primary-admin) !important;
+        color: white !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.8rem 1rem !important;
+    }
+    
+    /* Recent Actions Panel */
+    #recent-actions-module {
+        border-radius: 10px !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        border: none !important;
+        overflow: hidden !important;
+    }
+    
+    /* Login Page Styling */
+    .login .form-row {
+        border-bottom: none !important;
+        padding: 0.5rem 0 !important;
+    }
+    
+    .login #content {
+        background: white !important;
+        border-radius: 15px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        padding: 2rem !important;
+        margin: 2rem auto !important;
+        max-width: 400px !important;
+    }
+    
+    .login #header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    /* Table Styling */
+    table {
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+    
+    thead th {
+        background: var(--primary-admin) !important;
+        color: white !important;
+        border: none !important;
+        padding: 1rem !important;
+        font-weight: 600 !important;
+    }
+    
+    tbody td {
+        padding: 0.8rem 1rem !important;
+        border-bottom: 1px solid #e9ecef !important;
+    }
+    
+    tbody tr:hover {
+        background: rgba(52, 152, 219, 0.05) !important;
+    }
+    
+    /* Pagination */
+    .pagination {
+        background: rgba(52, 152, 219, 0.1) !important;
+        border-radius: 8px !important;
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
+    }
+    
+    .pagination a {
+        background: white !important;
+        border: 2px solid #e9ecef !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        margin: 0 0.2rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .pagination a:hover {
+        background: var(--secondary-admin) !important;
+        color: white !important;
+        border-color: var(--secondary-admin) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    .pagination .this-page {
+        background: var(--secondary-admin) !important;
+        color: white !important;
+        border-color: var(--secondary-admin) !important;
+    }
+    
+    /* Filter Sidebar */
+    #changelist-filter {
+        background: white !important;
+        border-radius: 10px !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+        border: none !important;
+        padding: 1rem !important;
+    }
+    
+    #changelist-filter h2 {
+        background: linear-gradient(135deg, var(--primary-admin) 0%, #34495e 100%) !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 0.8rem 1rem !important;
+        margin: -1rem -1rem 1rem -1rem !important;
+    }
+    
+    /* Messages */
+    .messagelist li {
+        background: var(--success-admin) !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 1rem 1.5rem !important;
+        margin: 0.5rem 0 !important;
+        border: none !important;
+    }
+    
+    .messagelist li.error {
+        background: var(--accent-admin) !important;
+    }
+    
+    .messagelist li.warning {
+        background: var(--warning-admin) !important;
+    }
+    
+    /* Calendar and Clock */
+    .calendarbox, .clockbox {
+        border-radius: 10px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+        border: none !important;
+        overflow: hidden !important;
+    }
+    
+    .calendar caption {
+        background: linear-gradient(135deg, var(--secondary-admin) 0%, #2980b9 100%) !important;
+        color: white !important;
+        border-radius: 0 !important;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        #content {
+            padding: 1rem !important;
+        }
+        
+        .dashboard .module {
+            margin: 1rem 0 !important;
+        }
+        
+        #changelist-filter {
+            margin-bottom: 1rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <i class="fas fa-graduation-cap"></i> Student Grade Predictor Administration
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+{% endblock %}
+
+{% block footer %}
+<div id="footer" style="background: var(--primary-admin); color: white; padding: 1rem; text-align: center; margin-top: 2rem; border-radius: 8px;">
+    <p style="margin: 0;">
+        <i class="fas fa-graduation-cap"></i> 
+        <strong>Student Grade Predictor</strong> - Final Year Project | 
+        Kabarak University - Department of Information Technology
+    </p>
+</div>
+{% endblock %}

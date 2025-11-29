@@ -1,0 +1,165 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Train Model{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">Train Machine Learning Model</h1>
+        <p class="lead">Train the Random Forest classifier on synthetic student data.</p>
+        
+        {% if not model_loaded %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> 
+            No trained model found. Please train the model first.
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> 
+            Model is loaded and ready for predictions.
+            {% if latest_training %}
+            <br><small>Last trained: {{ latest_training.created_at }} | Accuracy: {{ latest_training.accuracy|floatformat:2 }}%</small>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Model Training</h5>
+            </div>
+            <div class="card-body">
+                <p>The system will generate synthetic student data and train a Random Forest classifier to predict academic classifications.</p>
+                
+                <div class="mb-4">
+                    <h6>Features Used for Prediction:</h6>
+                    <ul>
+                        <li><strong>GPA</strong> - Grade Point Average (1.0 - 4.0)</li>
+                        <li><strong>Completed Units</strong> - Number of academic units completed</li>
+                        <li><strong>Internship Completed</strong> - Whether internship was completed (Yes/No)</li>
+                        <li><strong>Participation</strong> - Level of participation (Low/Medium/High)</li>
+                        <li><strong>Discipline Score</strong> - Behavioral score (0-100)</li>
+                        <li><strong>Assignment Score</strong> - Average assignment score (0-100)</li>
+                    </ul>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-brain"></i> Train Model
+                    </button>
+                    <a href="{% url 'download_training_data' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-download"></i> Download Training Data
+                    </a>
+                </form>
+            </div>
+        </div>
+        
+        {% if metrics %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Training Results</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ metrics.accuracy|floatformat:2 }}%</h3>
+                                <p class="mb-0">Accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ metrics.training_time|floatformat:2 }}s</h3>
+                                <p class="mb-0">Training Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ metrics.data_size }}</h3>
+                                <p class="mb-0">Training Samples</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ metrics.test_size }}</h3>
+                                <p class="mb-0">Test Samples</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Model Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Algorithm: Random Forest Classifier</h6>
+                <ul class="small">
+                    <li><strong>Ensemble Method:</strong> Combines multiple decision trees</li>
+                    <li><strong>Advantages:</strong> High accuracy, handles mixed data types</li>
+                    <li><strong>Robust:</strong> Resistant to overfitting</li>
+                    <li><strong>Interpretable:</strong> Provides feature importance</li>
+                </ul>
+                
+                <h6>Target Classes:</h6>
+                <ul class="small">
+                    <li>First Class</li>
+                    <li>Second Upper</li>
+                    <li>Second Lower</li>
+                    <li>Pass</li>
+                    <li>Fail</li>
+                </ul>
+            </div>
+        </div>
+        
+        {% if metrics %}
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Feature Importance</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if visualizations.feature_importance %}
+                <img src="data:image/png;base64,{{ visualizations.feature_importance }}" 
+                     alt="Feature Importance" class="img-fluid">
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if metrics and visualizations.confusion_matrix %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-table"></i> Confusion Matrix</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="data:image/png;base64,{{ visualizations.confusion_matrix }}" 
+                     alt="Confusion Matrix" class="img-fluid" style="max-width: 600px;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Visualizations{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">Prediction Visualizations</h1>
+        <p class="lead">Interactive charts and graphs generated from your prediction data.</p>
+    </div>
+</div>
+
+{% if not predictions %}
+<!-- No Data Message -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+                <h3>No Prediction Data Available</h3>
+                <p class="text-muted">Make some predictions first to see visualizations here.</p>
+                <div class="mt-3">
+                    <a href="{% url 'predict_single' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-graduate"></i> Single Prediction
+                    </a>
+                    <a href="{% url 'upload_csv' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-file-upload"></i> Bulk CSV Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Statistics Cards -->
+<div class="row mt-4">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-bar fa-2x mb-2"></i>
+                <h3>{{ total_predictions }}</h3>
+                <p class="mb-0">Total Predictions</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-percentage fa-2x mb-2"></i>
+                <h3>{{ average_confidence|floatformat:1 }}%</h3>
+                <p class="mb-0">Avg Confidence</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                <h3>{{ class_distribution|length }}</h3>
+                <p class="mb-0">Classes Predicted</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <i class="fas fa-user fa-2x mb-2"></i>
+                <h3>{{ user.username }}</h3>
+                <p class="mb-0">Analyst</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ACTUAL CHARTS SECTION -->
+<div class="row mt-4">
+    <!-- Class Distribution Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Class Distribution</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.class_distribution %}
+                <img src="data:image/png;base64,{{ charts.class_distribution }}" 
+                     alt="Class Distribution" class="img-fluid rounded">
+                {% else %}
+                <p class="text-muted">No class distribution data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feature Comparison Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Feature Comparison</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.feature_comparison %}
+                <img src="data:image/png;base64,{{ charts.feature_comparison }}" 
+                     alt="Feature Comparison" class="img-fluid rounded">
+                {% else %}
+                <p class="text-muted">No feature comparison data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Confidence Distribution Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Confidence Distribution</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.confidence_distribution %}
+                <img src="data:image/png;base64,{{ charts.confidence_distribution }}" 
+                     alt="Confidence Distribution" class="img-fluid rounded">
+                {% else %}
+                <p class="text-muted">No confidence distribution data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- GPA vs Assignment Score Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-scatter-chart"></i> GPA vs Assignment Score</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if charts.gpa_vs_assignment %}
+                <img src="data:image/png;base64,{{ charts.gpa_vs_assignment }}" 
+                     alt="GPA vs Assignment Score" class="img-fluid rounded">
+                {% else %}
+                <p class="text-muted">No scatter plot data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions Table -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-table"></i> Recent Predictions Data</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>GPA</th>
+                                <th>Units</th>
+                                <th>Internship</th>
+                                <th>Participation</th>
+                                <th>Discipline</th>
+                                <th>Assignment</th>
+                                <th>Predicted Class</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in predictions|slice:":10" %}
+                            <tr>
+                                <td><small>{{ prediction.created_at|date:"M d, Y" }}</small></td>
+                                <td>{{ prediction.gpa }}</td>
+                                <td>{{ prediction.completed_units }}</td>
+                                <td>{{ prediction.internship_completed }}</td>
+                                <td>{{ prediction.participation }}</td>
+                                <td>{{ prediction.discipline_score }}</td>
+                                <td>{{ prediction.assignment_score }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if prediction.predicted_class == 'First Class' %}bg-success
+                                        {% elif prediction.predicted_class == 'Second Upper' %}bg-info
+                                        {% elif prediction.predicted_class == 'Second Lower' %}bg-warning
+                                        {% elif prediction.predicted_class == 'Pass' %}bg-primary
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ prediction.predicted_class }}
+                                    </span>
+                                </td>
+                                <td>{{ prediction.confidence|floatformat:1 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

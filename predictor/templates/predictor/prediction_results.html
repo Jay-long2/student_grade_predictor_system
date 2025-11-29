@@ -1,0 +1,213 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Prediction Results{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">Prediction Results</h1>
+        <p class="lead">View your latest prediction results.</p>
+    </div>
+</div>
+
+{% if latest_single %}
+<!-- Single Prediction Results -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Latest Single Prediction</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Input Data:</h6>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>GPA:</span>
+                                <strong>{{ latest_single.gpa }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Completed Units:</span>
+                                <strong>{{ latest_single.completed_units }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Internship:</span>
+                                <strong>{{ latest_single.internship_completed }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Participation:</span>
+                                <strong>{{ latest_single.participation }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Discipline Score:</span>
+                                <strong>{{ latest_single.discipline_score }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Assignment Score:</span>
+                                <strong>{{ latest_single.assignment_score }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Prediction Result:</h6>
+                        <div class="text-center py-4">
+                            <div class="display-4 mb-3 
+                                {% if latest_single.predicted_class == 'First Class' %}text-success
+                                {% elif latest_single.predicted_class == 'Second Upper' %}text-info
+                                {% elif latest_single.predicted_class == 'Second Lower' %}text-warning
+                                {% elif latest_single.predicted_class == 'Pass' %}text-primary
+                                {% else %}text-danger{% endif %}">
+                                {{ latest_single.predicted_class }}
+                            </div>
+                            <div class="h4 text-muted">
+                                Confidence: {{ latest_single.confidence|floatformat:1 }}%
+                            </div>
+                        </div>
+                        
+                        {% if latest_single.probabilities %}
+                        <h6>Class Probabilities:</h6>
+                        <div class="progress-stacked mb-2">
+                            {% for class_name, probability in latest_single.probabilities.items %}
+                            <div class="progress" style="width: {{ probability|floatformat:2 }}%">
+                                <div class="progress-bar 
+                                    {% if class_name == 'First Class' %}bg-success
+                                    {% elif class_name == 'Second Upper' %}bg-info
+                                    {% elif class_name == 'Second Lower' %}bg-warning
+                                    {% elif class_name == 'Pass' %}bg-primary
+                                    {% else %}bg-danger{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: 100%">
+                                    <small>{{ probability|floatformat:1 }}%</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">Hover over bars to see probabilities</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if latest_bulk and bulk_results %}
+<!-- Bulk Prediction Results -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-csv"></i> Latest Bulk Prediction
+                    <span class="badge bg-light text-dark float-end">
+                        {{ latest_bulk.processed_records }}/{{ latest_bulk.total_records }} records
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>GPA</th>
+                                <th>Units</th>
+                                <th>Internship</th>
+                                <th>Participation</th>
+                                <th>Predicted Class</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in bulk_results %}
+                            <tr>
+                                <td>{{ result.student_id }}</td>
+                                <td>{{ result.gpa }}</td>
+                                <td>{{ result.completed_units }}</td>
+                                <td>{{ result.internship_completed }}</td>
+                                <td>{{ result.participation }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if result.predicted_class == 'First Class' %}bg-success
+                                        {% elif result.predicted_class == 'Second Upper' %}bg-info
+                                        {% elif result.predicted_class == 'Second Lower' %}bg-warning
+                                        {% elif result.predicted_class == 'Pass' %}bg-primary
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ result.predicted_class }}
+                                    </span>
+                                </td>
+                                <td>{{ result.confidence|floatformat:1 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'download_bulk_results' latest_bulk.id %}" class="btn btn-success">
+                        <i class="fas fa-download"></i> Download Full Results (CSV)
+                    </a>
+                    <a href="{% url 'upload_csv' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-upload"></i> Upload New CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if not latest_single and not latest_bulk %}
+<!-- No Results Message -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+                <h3>No Prediction Results Yet</h3>
+                <p class="text-muted">Make your first prediction to see results here.</p>
+                <div class="mt-3">
+                    <a href="{% url 'predict_single' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-graduate"></i> Single Prediction
+                    </a>
+                    <a href="{% url 'upload_csv' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-file-upload"></i> Bulk CSV Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-rocket"></i> Next Steps</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <a href="{% url 'predict_single' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-graduate"></i> New Single Prediction
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="{% url 'upload_csv' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-file-csv"></i> New Bulk Prediction
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="{% url 'visualization' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar"></i> View Visualizations
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

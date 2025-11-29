@@ -1,0 +1,174 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4">Prediction Dashboard</h1>
+        <p class="lead">Welcome back, {{ user.username }}! Manage your grade predictions here.</p>
+        
+        {% if not model_loaded %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> 
+            <strong>ML Model Not Loaded</strong> - Please 
+            <a href="{% url 'train_model' %}" class="alert-link">train the model</a> 
+            before making predictions.
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> 
+            <strong>ML Model Ready</strong> - You can now make predictions.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Stats Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                <h3>{{ total_predictions }}</h3>
+                <p class="mb-0">Total Predictions</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-file-csv fa-3x mb-3"></i>
+                <h3>{{ bulk_predictions }}</h3>
+                <p class="mb-0">Bulk Predictions</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                <h3>{{ user.username }}</h3>
+                <p class="mb-0">Active User</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <i class="fas fa-brain fa-3x mb-3"></i>
+                <h3>{% if model_loaded %}Ready{% else %}Train{% endif %}</h3>
+                <p class="mb-0">Model Status</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Quick Actions -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'predict_single' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-user-graduate"></i> Single Prediction
+                    </a>
+                    <a href="{% url 'upload_csv' %}" class="btn btn-info btn-lg">
+                        <i class="fas fa-file-upload"></i> Bulk CSV Upload
+                    </a>
+                    <a href="{% url 'visualization' %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-chart-bar"></i> View Visualizations
+                    </a>
+                    {% if model_loaded %}
+                    <a href="{% url 'train_model' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-cogs"></i> Retrain Model
+                    </a>
+                    {% else %}
+                    <a href="{% url 'train_model' %}" class="btn btn-danger">
+                        <i class="fas fa-cogs"></i> Train Model First
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Predictions -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Predictions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_predictions %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>GPA</th>
+                                <th>Prediction</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in recent_predictions %}
+                            <tr>
+                                <td><small>{{ prediction.created_at|date:"M d" }}</small></td>
+                                <td>{{ prediction.gpa }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if prediction.predicted_class == 'First Class' %}bg-success
+                                        {% elif prediction.predicted_class == 'Second Upper' %}bg-info
+                                        {% elif prediction.predicted_class == 'Second Lower' %}bg-warning
+                                        {% elif prediction.predicted_class == 'Pass' %}bg-primary
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ prediction.predicted_class }}
+                                    </span>
+                                </td>
+                                <td>{{ prediction.confidence|floatformat:1 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'prediction_results' %}" class="btn btn-outline-success btn-sm">
+                        View All Results
+                    </a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No predictions yet. Make your first prediction!</p>
+                <div class="text-center">
+                    <a href="{% url 'predict_single' %}" class="btn btn-success">Make First Prediction</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clear History Button -->
+{% if total_predictions > 0 %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <form method="post" action="{% url 'clear_predictions' %}" onsubmit="return confirm('Are you sure you want to clear all prediction history? This action cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-warning">
+                        <i class="fas fa-trash"></i> Clear All Prediction History
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
